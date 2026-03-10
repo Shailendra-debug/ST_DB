@@ -1,14 +1,17 @@
-# Use Java 21 runtime
+# Build stage
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+
+WORKDIR /app
+COPY . .
+
+RUN mvn clean package -DskipTests
+
+# Run stage
 FROM eclipse-temurin:21-jdk
 
-# Working directory inside container
 WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 
-# Copy jar file
-COPY target/ST_DB-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose port
 EXPOSE 8080
 
-# Run application
 ENTRYPOINT ["java","-jar","app.jar"]
